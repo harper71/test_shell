@@ -2,17 +2,13 @@
 
 int main(int ac, char *av[])
 {
-	char *cmd = NULL, *cmd_cpy = NULL, *token = NULL;
-
-	char *delm = " \n";
+	char *cmd, *token;
 
 	size_t n = 0;
 
 	struct stat file;
 
-	int arg = 0, i = 0, var;
-
-	char **argv = NULL;
+	int arg = 0;
 
 	printf("$ ");
 	if (getline(&cmd, &n, stdin) == -1)
@@ -20,27 +16,14 @@ int main(int ac, char *av[])
 		return -1;
 	}
 
-	cmd_cpy = strdup(cmd);
-
-	while(cmd[i])
-	{
-		if(cmd[i] == '\n')
-		{
-			printf("\\n ---> input has %ld characters\n", strlen(cmd));
-		}
-		else
-			printf("%c", cmd[i]);
-		i++;
-	}
-	token = strtok(cmd, delm);
+	token = strtok(cmd, " \n");
 
 	while(token != NULL)
 	{
-		char dir[] = "usr/bin/";
+		char dir[] = "/usr/bin/";
 		char path[strlen(dir) + strlen(token) + 1];
-		printf("%s\n", token);
-		strcpy(path, dir);
-		strcat(path, token);
+
+		sprintf(path, "%s%s", dir, token);
 		if (stat(path, &file) == 0)
 		{
 			char *mycmd[] = {path, NULL};
@@ -56,15 +39,10 @@ int main(int ac, char *av[])
 		{
 			printf("%s not found\n", token);
 		}
-		token = strtok(NULL, delm);
+		token = strtok(NULL, " \n");
 		arg++;
-		
 	}
 	printf("%d\n", arg);
-
-
-
 	free(cmd);
-	free(cmd_cpy);
 	return 0;
 }
