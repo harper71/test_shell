@@ -30,42 +30,51 @@ int main(int *ac, char *av[])
 		prompt[len_prompt - 1] = '\0';
 		str_cpy = strdup(prompt);
 
+
+		argc = 0;
+
 		token = strtok(prompt, delm);
 		while (token)
 		{
 			token = strtok(NULL, delm);
 			argc++;
 		}
-		argv = malloc(sizeof(char *) * argc);
+		argv = malloc(sizeof(char *) * (argc + 1));
+		if (argv == NULL)
+		{
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
 
 		token = strtok(str_cpy, delm);
 
+		i = 0;
 		while(token)
 		{
 			argv[i] = token;
 			token = strtok(NULL, delm);
 			i++;
 		}
+		argv[i] = NULL;
 
-		while (argv[i])
+		pid = fork();
+		if (pid == -1)
 		{
-			pid = fork();
-			if (pid == 0)
+			perror("can't create the child process");
+			exit(EXIT_FAILURE);
+		}
+		else if (pid == 0)
+		{
+			var = execve(argv[0], argv, NULL);
+			if (var == -1)
 			{
-				cmd[0] = argv[0];
-				cmd[1] = argv[1];
-				cmd[2] = NULL;
-				var = execve(cmd[0], cmd, NULL);
-				if (var == -1)
-				{
-					printf("%s: no such directory\n", argv[0]);
-				}
-				break;
+				printf("%s: no such directory\n", av[0]);
+				exit(EXIT_FAILURE);
 			}
-			else
-			{
-				wait(NULL);
-			}
+		}
+		else
+		{
+			wait(NULL);
 		}
 		printf("$ ");
 	}
