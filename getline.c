@@ -6,15 +6,19 @@
  *
  * Return: 0 always
  */
-int main(int *ac, char *argv[])
+int main(int *ac, char *av[])
 {
-	char *prompt = NULL;
+	char *prompt = NULL, *str_cpy = NULL;
+
+	char *delm = " \n";
 
 	size_t lenVar = 0;
 
-	char *cmd[2];
+	char *cmd[3];
 
-	int var, len_prompt;
+	int var, len_prompt, i, argc;
+
+	char *token = NULL, **argv = NULL;
 
 	pid_t pid;
 
@@ -22,28 +26,46 @@ int main(int *ac, char *argv[])
 
 	while (getline(&prompt, &lenVar, stdin) != EOF)
 	{
-		cmd[0] = prompt;
-
-		cmd[1] = NULL;
-
 		len_prompt = strlen(prompt);
-
 		prompt[len_prompt - 1] = '\0';
+		str_cpy = strdup(prompt);
 
-
-		pid = fork();
-		if (pid == 0)
+		token = strtok(prompt, delm);
+		while (token)
 		{
-			var = execve(cmd[0], cmd, NULL);
-			if (var == -1)
-			{
-				printf("%s: no such directory\n", argv[0]);
-			}
-			break;
+			token = strtok(NULL, delm);
+			argc++;
 		}
-		else
+		argv = malloc(sizeof(char *) * argc);
+
+		token = strtok(str_cpy, delm);
+
+		while(token)
 		{
-			wait(NULL);
+			argv[i] = token;
+			token = strtok(NULL, delm);
+			i++;
+		}
+
+		while (argv[i])
+		{
+			pid = fork();
+			if (pid == 0)
+			{
+				cmd[0] = argv[0];
+				cmd[1] = argv[1];
+				cmd[2] = NULL;
+				var = execve(cmd[0], cmd, NULL);
+				if (var == -1)
+				{
+					printf("%s: no such directory\n", argv[0]);
+				}
+				break;
+			}
+			else
+			{
+				wait(NULL);
+			}
 		}
 		printf("$ ");
 	}

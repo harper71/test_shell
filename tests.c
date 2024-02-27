@@ -11,40 +11,34 @@ int main(int ac, char *av[])
 	pid_t pid;
 
 	printf("$ ");
-
-	if (getline(&prompt, &n, stdin) == -1)
-	{
-		perror("can't start shell");
-	}
-
-	while (getline(&prompt, &n, stdin) != EOF)
+	while (getline(&prompt, &n, stdin) != -1)
 	{
 		len_prompt = strlen(prompt);
 
 		prompt[len_prompt - 1] = '\0';
-		token = strtok(prompt, " ");
+		token = strtok(prompt, " \n");
 		while(token != NULL)
 		{
 			pid = fork();
 			if (pid == 0)
 			{
-					cmd[0] = token;
-					cmd[1] = NULL;
+				cmd[0] = token;
+				cmd[1] = NULL;
 
-					var = execve(cmd[0], cmd, NULL);
-					if (var == -1)
-					{
-						printf("%s: not a directory", av[0]);
-					}
+				var = execve(cmd[0], cmd, NULL);
+				if (var == -1)
+				{
+					printf("%s: not a directory\n", av[0]);
+				}
+				break;
 			}
 			else
 			{
-				wait(NULL); 
+				wait(NULL);
 
 			}
-			token = strtok(NULL, " ");
+			token = strtok(NULL, " \n");
 			break;
-
 		}
 		printf("$ ");
 	}

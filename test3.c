@@ -12,7 +12,7 @@ int main(int ac, char *av[])
 
 	struct stat file;
 
-	int arg = 0, i = 0, var;
+	int  var;
 
 	char **argv = NULL;
 
@@ -34,18 +34,16 @@ int main(int ac, char *av[])
 			printf("%c", cmd[i]);
 		i++;
 	}
-	token = strtok(cmd, delm);
 
-	while(getline(&cmd, &n, stdin) != EOF)
+	while(getline(&cmd, &n, stdin) != -1)
 	{
+		token = strtok(cmd, delm);
 		while(token != NULL)
 		{
 			char dir[] = "/usr/bin/";
 			char path[strlen(dir) + strlen(token) + 1];
 			strcpy(path, dir);
-			strcat(path, token);
-			arg++;
-
+			strcat(path, token)
 			if (stat(path, &file) == 0)
 			{
 				pid = fork();
@@ -59,7 +57,6 @@ int main(int ac, char *av[])
 					{
 						printf("can't execute this command.\n");
 					}
-					token = strtok(NULL, delm);
 				}
 				else
 				{
@@ -70,7 +67,7 @@ int main(int ac, char *av[])
 			{
 				printf("%s not found\n", token);
 			}
-			arg++;
+			token = strtok(NULL, delm);
 		}
 		printf("$ ");
 	}

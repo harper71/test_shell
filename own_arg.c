@@ -20,24 +20,13 @@ int main(int ac, char *av[])
 
 	while(token != NULL)
 	{
-		char dir[] = "/usr/bin/";
-		char path[strlen(dir) + strlen(token) + 1];
+		char *mycmd[] = {token[0], token[1], NULL};
 
-		sprintf(path, "%s%s", dir, token);
-		if (stat(path, &file) == 0)
+		int var = execve(mycmd[0], mycmd, NULL);
+
+		if (var == -1)
 		{
-			char *mycmd[] = {path, NULL};
-
-			int var = execve(mycmd[0], mycmd, NULL);
-
-			if (var == -1)
-			{
 			printf("can't execute this command.\n");
-			}
-		}
-		else
-		{
-			printf("%s not found\n", token);
 		}
 		token = strtok(NULL, " \n");
 		arg++;
