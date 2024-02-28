@@ -19,6 +19,7 @@ int main(int *ac, char *av[])
 	int var, len_prompt, i, argc;
 
 	char *token = NULL, **argv = NULL;
+	struct stat file;
 
 	pid_t pid;
 
@@ -56,26 +57,40 @@ int main(int *ac, char *av[])
 			i++;
 		}
 		argv[i] = NULL;
+		
+		char dir[] = "/usr/bin/";
+		char path[strlen(dir) + strlen(argv[i]) + 1];
+		strcpy(path, dir);
+		strcat(path, token);
 
-		pid = fork();
-		if (pid == -1)
+
+		if (stat(path, &file) == 0)
 		{
-			perror("can't create the child process");
-			exit(EXIT_FAILURE);
-		}
-		else if (pid == 0)
-		{
-			var = execve(argv[0], argv, NULL);
-			if (var == -1)
+			pid = fork();
+			if (pid == -1)
 			{
-				printf("%s: no such directory\n", av[0]);
+				perror("can't create the child process");
 				exit(EXIT_FAILURE);
+			}
+			else if (pid == 0)
+			{
+				var = execve(argv[0], argv, NULL);
+				if (var == -1)
+				{
+					printf("%s: no such directory\n", av[0]);
+					exit(EXIT_FAILURE);
+				}
+			}
+			else
+			{
+				wait(NULL);
 			}
 		}
 		else
 		{
-			wait(NULL);
+			printf("%s: not found\n", argv[0]);
 		}
+
 		printf("$ ");
 	}
 	free(prompt);
