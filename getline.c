@@ -1,8 +1,8 @@
 #include "main.h"
 /**
  * main - used to create a command shell enviroment
- * @ac: argument count
- * @argv: arguments
+ * @ac: argument count of user
+ * @argv: arguments of user
  *
  * Return: 0 always
  */
